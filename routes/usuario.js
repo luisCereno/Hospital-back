@@ -1,4 +1,5 @@
 var express = require('express');
+var bcrypt = require('bcryptjs');
 
 var app = express();
 
@@ -48,7 +49,7 @@ app.post('/', (req, res) => {
 
         nombre: body.nombre,
         email: body.email,
-        password: body.password,
+        password: bcrypt.hashSync(body.password, 10),
         img: body.img,
         role: body.role
 
@@ -59,7 +60,7 @@ app.post('/', (req, res) => {
 
         if (err) {
 
-            return res.status(500).json({
+            return res.status(400).json({
 
                 ok: false,
                 mensaje: 'Error al crear usuario',
