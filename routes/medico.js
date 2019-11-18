@@ -1,8 +1,8 @@
 var express = require('express');
 
-var app = express();
-
 var mdAutenticacion = require('../middlewares/autenticacion');
+
+var app = express();
 
 //Importar modelo de medico
 var Medico = require('../models/medico');
@@ -12,7 +12,14 @@ var Medico = require('../models/medico');
 //============================================================== 
 app.get('/', (req, res, next) => {
 
-    Medico.find({}, 'nombre img')
+    var desde = req.query.desde || 0;
+    desde = Number(desde);
+
+    Medico.find({})
+        .skip(desde)
+        .limit(5)
+        .populate('usuario', 'nombre email')
+        .populate('hospital')
         .exec( (err, medicos) => {
 
         if (err) {
@@ -27,11 +34,16 @@ app.get('/', (req, res, next) => {
             
         }
 
-        res.status(200).json({
+        Medico.count({}, (err, conteo) => {
 
-            ok: true,
-            medicos: medicos
-    
+            res.status(200).json({
+
+                ok: true,
+                medicos: medicos,
+                total: conteo
+        
+            });
+
         });
 
     });
@@ -61,8 +73,6 @@ app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
         }
 
         if (!medico) {
-            
-            if (err) {
 
                 return res.status(400).json({
     
@@ -71,8 +81,6 @@ app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
                     errors: {message: 'No existe medico con ese ID'}
     
                 });
-                
-            }
 
         }
 
