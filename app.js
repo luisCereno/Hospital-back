@@ -16,6 +16,7 @@ var loginRoutes = require('./routes/login');
 var medicoRoutes = require('./routes/medico');
 var uploadRoutes = require('./routes/upload');
 var usuarioRoutes = require('./routes/usuario');
+var imagenesRoutes = require('./routes/imagenes');
 var hospitalRoutes = require('./routes/hospital');
 var busquedaRoutes = require('./routes/busqueda');
 
@@ -34,6 +35,7 @@ app.use('/busqueda', busquedaRoutes);
 app.use('/usuario', usuarioRoutes);
 app.use('/upload', uploadRoutes);
 app.use('/medico', medicoRoutes);
+app.use('/img', imagenesRoutes);
 app.use('/login', loginRoutes);
 app.use('/', appRoutes);
 

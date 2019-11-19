@@ -1,7 +1,14 @@
 var express = require('express');
+
 var fileUpload = require('express-fileupload');
+var fs = require('fs');
 
 var app = express();
+
+//Modelo
+var Usuario = require('../models/usuario');
+var Medico = require('../models/medico');
+var Hospital = require('../models/medico');
 
 // default options
 app.use(fileUpload());
@@ -81,16 +88,124 @@ app.put('/:tipo/:id', (req, res, next) => {
             
         }
         
-        res.status(200).json({
-    
-            ok: true,
-            mensaje: 'Peticion realizada correctamente',
-            extensionArchivo: extensionArchivo
-    
-        });
+        subirPorTipo( tipo, id, nombreArchivo, res); 
 
     });
 
 });
+
+//============================================================== 
+// Funcion para subir imagenes por tipo de colecciones
+//============================================================== 
+function subirPorTipo( tipo, id, nombreArchivo, res) {
+
+    //============================================================== 
+    // Subir por tipo usuarios
+    //============================================================== 
+    if (tipo === 'usuarios') {
+
+        Usuario.findById(id, (err, usuario) => {
+
+            var pathViejo = './uploads/usuarios/' + usuario.img;
+
+            //Si existe, elimina la imagen anterior
+            if (fs.existsSync(pathViejo)) {
+
+                fs.unlinkSync(pathViejo);
+                
+            }
+
+            //Se almacena nombre de la img
+            usuario.img = nombreArchivo;
+
+            usuario.save((err, usuarioActualizado) => {
+
+                usuarioActualizado.password = ':)';
+
+                return res.status(200).json({
+
+                    ok: true,
+                    mensaje: 'Imagen de usuario actualizada',
+                    usuario: usuarioActualizado
+
+                });
+
+            });
+
+        });
+        
+    }
+
+    //============================================================== 
+    // Subir por tipo medicos
+    //============================================================== 
+    if (tipo === 'medicos') {
+
+        Medico.findById(id, (err, medico) => {
+
+            var pathViejo = './uploads/medicos/' + medico.img;
+
+            //Si existe, elimina la imagen anterior
+            if (fs.existsSync(pathViejo)) {
+
+                fs.unlinkSync(pathViejo);
+                
+            }
+
+            //Se almacena nombre de la img
+            medico.img = nombreArchivo;
+
+            medico.save((err, medicoActualizado) => {
+
+                return res.status(200).json({
+
+                    ok: true,
+                    mensaje: 'Imagen de medico actualizada',
+                    medico: medicoActualizado
+
+                });
+
+            });
+
+        });
+        
+    }
+
+     //============================================================== 
+    // Subir por tipo hospitales
+    //============================================================== 
+    if (tipo === 'hospitales') {
+
+        Hospital.findById(id, (err, hospital) => {
+
+            var pathViejo = './uploads/hospitales/' + hospital.img;
+
+            //Si existe, elimina la imagen anterior
+            if (fs.existsSync(pathViejo)) {
+
+                fs.unlinkSync(pathViejo);
+                
+            }
+
+            //Se almacena nombre de la img
+            hospital.img = nombreArchivo;
+
+            hospital.save((err, hospitalActualizado) => {
+
+                return res.status(200).json({
+
+                    ok: true,
+                    mensaje: 'Imagen del hospital actualizada',
+                    hospital: hospitalActualizado
+
+                });
+
+            });
+
+        });
+        
+    }
+
+}
 
 module.exports = app;
